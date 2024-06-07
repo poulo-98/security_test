@@ -139,7 +139,7 @@ app.get('/get-clicks', async (req, res) => {
             <html lang="">
             <body>
                 <div style="display: flex;flex-direction: column; align-content: center;justify-content: center; ">
-                 <h1>Nombre de chargements : ${clickCount.nombreChargement}</h1>
+                 <h1>Nombre de chargements : ${clickCount.nombreChargement} </h1>
                  <h1>Nombre de clicks : ${clickCount.clicks}</h1>
                 </div>
                 
