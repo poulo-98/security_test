@@ -15,14 +15,27 @@ if (!fs.existsSync(dataFilePath)) {
     console.log('Fichier user_data.json déjà existant.');
 }
 
-// Servir les fichiers statiques depuis le répertoire public
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Route pour gérer la demande à la racine de l'application
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('/', async (req, res) => {
+    console.log('Chargement mis à jour:');
+    try {
+        let clickCount = await ClickCount.findOne();
+        if (!clickCount) {
+            clickCount = await ClickCount.create();
+        }
+        clickCount.nombreChargement += 1;
+        await clickCount.save();
+        console.log('Nombre de Chargement mis à jour:', clickCount.nombreChargement);
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } catch (dbErr) {
+        console.error('Erreur de mise à jour du nombre de clics:', dbErr);
+        res.status(500).json({message: 'Erreur de mise à jour du nombre de clics'});
+    }
 });
 
+// Servir les fichiers statiques depuis le répertoire public
+app.use(express.static(path.join(__dirname, 'public')));
 // Route pour récupérer les valeurs depuis l'URL et les stocker dans un fichier
 app.get('/user/:username/:email/:telephoneNumber', async (req, res) => {
     const { username, email, telephoneNumber } = req.params;
@@ -100,12 +113,34 @@ app.get('/clicks', async (req, res) => {
         }
 
         res.send(`
-            <html>
+            <html lang="">
             <body>
                 <div style="display: flex; align-content: center;justify-content: center">
                     <img src="image.png" alt="Image" />
                 </div>
-                <p>Nombre de click: ${clickCount.clicks}</p>
+            </body>
+            </html>
+        `);
+    } catch (err) {
+        console.error('Erreur lors de la récupération du nombre de clics:', err);
+        res.status(500).json({ message: 'Erreur lors de la récupération du nombre de clics' });
+    }
+});
+app.get('/get-clicks', async (req, res) => {
+    try {
+        let clickCount = await ClickCount.findOne();
+        if (!clickCount) {
+            clickCount = await ClickCount.create();
+        }
+
+        res.send(`
+            <html lang="">
+            <body>
+                <div style="display: flex;flex-direction: column; align-content: center;justify-content: center; ">
+                 <h1>Nombre de chargements : ${clickCount.nombreChargement}</h1>
+                 <h1>Nombre de clicks : ${clickCount.clicks}</h1>
+                </div>
+                
             </body>
             </html>
         `);
