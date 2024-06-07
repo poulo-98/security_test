@@ -111,7 +111,8 @@ app.get('/clicks', async (req, res) => {
         if (!clickCount) {
             clickCount = await ClickCount.create();
         }
-
+        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
         res.send(`
             <html lang="">
             <body>
@@ -132,7 +133,8 @@ app.get('/get-clicks', async (req, res) => {
         if (!clickCount) {
             clickCount = await ClickCount.create();
         }
-
+        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
         res.send(`
             <html lang="">
             <body>
